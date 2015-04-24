@@ -1,0 +1,5 @@
+FROM cockroachdb/cockroach
+
+ENTRYPOINT ["bash"]
+CMD ["-c", "./cockroach start -stores ssd=/data -gossip self://"]
+
