@@ -18,28 +18,28 @@ var url string
 var port string
 var color string
 var hostname string
+var counter string
+var div string
 
+func getEnv(v *string, env string, def string) {
+	*v = os.Getenv(env)
+	if *v == "" {
+		if def == "" {
+			fmt.Println("[ERROR] required: ", env)
+			os.Exit(1)
+		}
+		*v = def
+	}
+	fmt.Printf("[DEBUG] %s=%s\n", env, *v)
+}
 func init() {
 	fmt.Println("\nCounter webapp v0.0.1")
-	url = os.Getenv("COCKROACH_URL")
-	if url == "" {
-		fmt.Println("COCKROACH_URL is unset")
-		os.Exit(1)
-	}
-
-	port = os.Getenv("PORT")
-	if port == "" {
-		fmt.Println("PORT is unset defaulting to: 8080")
-		port = "8080"
-	}
-
-	color = os.Getenv("COLOR")
-	if color == "" {
-		color = "white"
-	}
-
-	fmt.Println("COCKROACH_URL=", url, "\nPORT=", port)
-	hostname = os.Getenv("HOSTNAME")
+	getEnv(&url, "COCKROACH_URL", "")
+	getEnv(&port, "PORT", "8080")
+	getEnv(&color, "COLOR", "white")
+	getEnv(&counter, "PORT", "Counter")
+	getEnv(&hostname, "HOSTNAME", "webapp")
+	getEnv(&div, "DIV", "<div>(c)copileft 2015.</div>")
 }
 
 func getCounter() int {
@@ -63,7 +63,6 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func incHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("inc ...")
 	b := bytes.NewBufferString("1")
 	http.Post("http://"+url+"/kv/rest/counter/x", "application/x-www-form-urilencoded", b)
 	fmt.Fprintf(w, getHtml())
@@ -74,16 +73,16 @@ func getHtml() string {
 <html>
   <body bgcolor="%s">
   <a href="/"><h1>Host: %s</h1></a>
-    <h2>Counter: %d</h2>
+    <h2>%s: %d</h2>
     <a href="/inc">ADD</a>
+    %s
   </body>
-</html>`, color, hostname, getCounter())
+</html>`, color, hostname, counter, getCounter(), div)
 	return html
 }
 
 func main() {
 	fmt.Println("counter:", getCounter())
-
 	http.HandleFunc("/", getHandler)
 	http.HandleFunc("/inc/", incHandler)
 	http.ListenAndServe(":"+port, nil)
