@@ -1,0 +1,8 @@
+cockroach:
+    ports:
+        - "8080"
+    volumes:
+        - "/cockroach:/data"
+    image: cockroachdb/cockroach
+    entrypoint: bash
+    command: -c './cockroach start -stores ssd=/data -gossip self://'
