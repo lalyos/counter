@@ -37,7 +37,7 @@ func init() {
 	getEnv(&url, "COCKROACH_URL", "")
 	getEnv(&port, "PORT", "9090")
 	getEnv(&color, "COLOR", "white")
-	getEnv(&counter, "PORT", "Counter")
+	getEnv(&counter, "COUNTER", "Counter")
 	getEnv(&hostname, "HOSTNAME", "webapp")
 	getEnv(&div, "DIV", "<div>(c)copileft 2015.</div>")
 }
