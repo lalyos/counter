@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -15,6 +16,7 @@ type KV struct {
 
 var url string
 var port string
+var hostname string
 
 func init() {
 	fmt.Println("\nCounter webapp v0.0.1")
@@ -30,6 +32,8 @@ func init() {
 		port = "8080"
 	}
 
+	fmt.Println("COCKROACH_URL=", url, "\nPORT=", port)
+	hostname = os.Getenv("HOSTNAME")
 }
 
 func getCounter() int {
@@ -49,18 +53,32 @@ func getCounter() int {
 }
 
 func getHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, `
+	fmt.Fprintf(w, getHtml())
+}
+
+func incHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("inc ...")
+	b := bytes.NewBufferString("1")
+	http.Post("http://"+url+"/kv/rest/counter/x", "application/x-www-form-urilencoded", b)
+	fmt.Fprintf(w, getHtml())
+}
+
+func getHtml() string {
+	html := fmt.Sprintf(`
 <html>
   <body>
+  <h1>Host: %s</h1>
     <h2>Counter: %d</h2>
+    <a href="/inc">ADD</a>
   </body>
-</html>`, getCounter())
+</html>`, hostname, getCounter())
+	return html
 }
 
 func main() {
 	fmt.Println("counter:", getCounter())
 
-	http.HandleFunc("/get/", getHandler)
-	//http.HandleFunc("/inc/", incHandler)
+	http.HandleFunc("/", getHandler)
+	http.HandleFunc("/inc/", incHandler)
 	http.ListenAndServe(":"+port, nil)
 }
