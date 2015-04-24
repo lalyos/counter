@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"os"
 )
@@ -32,6 +33,28 @@ func getEnv(v *string, env string, def string) {
 	}
 	fmt.Printf("[DEBUG] %s=%s\n", env, *v)
 }
+
+func getIP() {
+	addrs, err := net.InterfaceAddrs()
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	for _, address := range addrs {
+
+		// check the address type and if it is not a loopback the display it
+		if ipnet, ok := address.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+			if ipnet.IP.To4() != nil {
+				fmt.Println(ipnet.IP.String())
+				fmt.Printf("===> http://%s:%s\n", ipnet.IP.String(), port)
+			}
+
+		}
+	}
+
+}
 func init() {
 	fmt.Println("\nCounter webapp v0.0.1")
 	getEnv(&url, "COCKROACH_URL", "")
@@ -40,6 +63,7 @@ func init() {
 	getEnv(&counter, "COUNTER", "Counter")
 	getEnv(&hostname, "HOSTNAME", "webapp")
 	getEnv(&div, "DIV", "<div>(c)copileft 2015.</div>")
+	getIP()
 }
 
 func getCounter() int {
