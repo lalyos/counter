@@ -35,7 +35,7 @@ func getEnv(v *string, env string, def string) {
 func init() {
 	fmt.Println("\nCounter webapp v0.0.1")
 	getEnv(&url, "COCKROACH_URL", "")
-	getEnv(&port, "PORT", "8080")
+	getEnv(&port, "PORT", "9090")
 	getEnv(&color, "COLOR", "white")
 	getEnv(&counter, "PORT", "Counter")
 	getEnv(&hostname, "HOSTNAME", "webapp")
