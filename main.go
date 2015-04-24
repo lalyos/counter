@@ -16,6 +16,7 @@ type KV struct {
 
 var url string
 var port string
+var color string
 var hostname string
 
 func init() {
@@ -30,6 +31,11 @@ func init() {
 	if port == "" {
 		fmt.Println("PORT is unset defaulting to: 8080")
 		port = "8080"
+	}
+
+	color = os.Getenv("COLOR")
+	if color == "" {
+		color = "white"
 	}
 
 	fmt.Println("COCKROACH_URL=", url, "\nPORT=", port)
@@ -66,12 +72,12 @@ func incHandler(w http.ResponseWriter, r *http.Request) {
 func getHtml() string {
 	html := fmt.Sprintf(`
 <html>
-  <body>
-  <h1>Host: %s</h1>
+  <body bgcolor="%s">
+  <a href="/"><h1>Host: %s</h1></a>
     <h2>Counter: %d</h2>
     <a href="/inc">ADD</a>
   </body>
-</html>`, hostname, getCounter())
+</html>`, color, hostname, getCounter())
 	return html
 }
 
